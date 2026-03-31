@@ -1,0 +1,117 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+
+  /* light theme (default) */
+  --color-bg: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-border: #d0d7de;
+  --color-text: #1f2328;
+  --color-text-muted: #656d76;
+  --color-accent: #1f6feb;
+  --color-accent-hover: #388bfd;
+  --color-success: #238636;
+  --color-danger: #da3633;
+
+  /* node colors - light */
+  --node-class-bg: #ffffff;
+  --node-class-border: #d0d7de;
+  --node-abstract-bg: #f6f8fa;
+  --node-abstract-border: #8250df;
+  --node-interface-bg: #ddf4ff;
+  --node-interface-border: #1f6feb;
+  --node-enum-bg: #fff8c5;
+  --node-enum-border: #9a6700;
+  --node-record-bg: #dafbe1;
+  --node-record-border: #238636;
+  --node-sealed-bg: #fff0b3;
+  --node-sealed-border: #bf8700;
+  --node-struct-bg: #ffeff7;
+  --node-struct-border: #bf3989;
+  --node-object-bg: #fef3c7;
+  --node-object-border: #d97706;
+  --node-trait-bg: #ede9fe;
+  --node-trait-border: #7c3aed;
+  --node-dataclass-bg: #ecfdf5;
+  --node-dataclass-border: #059669;
+
+  /* edge colors */
+  --edge-extends: #8250df;
+  --edge-implements: #1f6feb;
+  --edge-depends: #656d76;
+
+  /* text on nodes */
+  --node-text: #1f2328;
+  --node-stereotype: #656d76;
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme='dark'] {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-text: #e6edf3;
+  --color-text-muted: #7d8590;
+  --color-accent: #388bfd;
+  --color-accent-hover: #58a6ff;
+  --color-success: #3fb950;
+  --color-danger: #f85149;
+
+  /* node colors - dark */
+  --node-class-bg: #161b22;
+  --node-class-border: #30363d;
+  --node-abstract-bg: #1c1228;
+  --node-abstract-border: #8b5cf6;
+  --node-interface-bg: #0d2044;
+  --node-interface-border: #388bfd;
+  --node-enum-bg: #2d2200;
+  --node-enum-border: #d29922;
+  --node-record-bg: #0d2d17;
+  --node-record-border: #3fb950;
+  --node-sealed-bg: #2d2000;
+  --node-sealed-border: #e3b341;
+  --node-struct-bg: #2d0d1f;
+  --node-struct-border: #db61a2;
+  --node-object-bg: #2d1a00;
+  --node-object-border: #f0883e;
+  --node-trait-bg: #1e0d3f;
+  --node-trait-border: #a78bfa;
+  --node-dataclass-bg: #0d2d1f;
+  --node-dataclass-border: #34d399;
+
+  /* edge colors */
+  --edge-extends: #a78bfa;
+  --edge-implements: #388bfd;
+  --edge-depends: #7d8590;
+
+  /* text on nodes */
+  --node-text: #e6edf3;
+  --node-stereotype: #7d8590;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
