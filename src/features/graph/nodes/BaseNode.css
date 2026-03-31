@@ -1,0 +1,128 @@
+.poo-node {
+  min-width: 160px;
+  max-width: 260px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 2px solid var(--node-class-border);
+  background-color: var(--node-class-bg);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  transition: box-shadow 0.15s, opacity 0.2s;
+  user-select: none;
+}
+
+.poo-node--selected,
+.poo-node:hover {
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.poo-node--opaque {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.poo-node__stereotype {
+  font-size: 10px;
+  color: var(--node-stereotype);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.poo-node__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--node-text);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.poo-node__details {
+  margin-top: 4px;
+}
+
+.poo-node__divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 6px 0;
+}
+
+.poo-node__section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.poo-node__member {
+  display: flex;
+  gap: 3px;
+  align-items: baseline;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.poo-node__visibility {
+  color: var(--color-text-muted);
+  min-width: 10px;
+}
+
+.poo-node__member-name {
+  color: var(--node-text);
+}
+
+.poo-node__member-type {
+  color: var(--color-text-muted);
+}
+
+/* per-type styles */
+.poo-node--abstract {
+  border-style: dashed;
+  border-color: var(--node-abstract-border);
+  background-color: var(--node-abstract-bg);
+}
+
+.poo-node--interface {
+  border-color: var(--node-interface-border);
+  background-color: var(--node-interface-bg);
+}
+
+.poo-node--enum {
+  border-color: var(--node-enum-border);
+  background-color: var(--node-enum-bg);
+}
+
+.poo-node--record {
+  border-color: var(--node-record-border);
+  background-color: var(--node-record-bg);
+}
+
+.poo-node--sealed {
+  border-width: 3px;
+  border-color: var(--node-sealed-border);
+  background-color: var(--node-sealed-bg);
+}
+
+.poo-node--struct {
+  border-color: var(--node-struct-border);
+  background-color: var(--node-struct-bg);
+}
+
+.poo-node--object {
+  border-color: var(--node-object-border);
+  background-color: var(--node-object-bg);
+}
+
+.poo-node--trait {
+  border-style: dashed;
+  border-color: var(--node-trait-border);
+  background-color: var(--node-trait-bg);
+}
+
+.poo-node--dataclass {
+  border-color: var(--node-dataclass-border);
+  background-color: var(--node-dataclass-bg);
+}
