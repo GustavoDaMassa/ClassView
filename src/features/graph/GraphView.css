@@ -1,0 +1,44 @@
+.graph-view {
+  flex: 1;
+  position: relative;
+  background-color: var(--color-bg);
+}
+
+/* Override React Flow defaults to match our theme */
+.react-flow__background {
+  background-color: var(--color-bg);
+}
+
+.react-flow__controls {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.react-flow__controls-button {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.react-flow__controls-button:hover {
+  background-color: var(--color-bg);
+}
+
+.react-flow__controls-button svg {
+  fill: var(--color-text);
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Remove default node styles imposed by React Flow */
+.react-flow__node {
+  border: none;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
