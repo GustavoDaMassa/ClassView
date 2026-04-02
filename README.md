@@ -1,73 +1,76 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100">
+  <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" fill="none" stroke="#388bfd" stroke-width="6" stroke-linejoin="round"/>
+</svg>
 
-Currently, two official plugins are available:
+# ClassView
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Interactive OOP visualizer — select a project folder, explore your class graph.**
 
-## React Compiler
+Analyzes source files entirely in the browser via WebAssembly and renders classes, interfaces, abstract classes, enums, records and all their relationships as an interactive graph.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+</div>
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **No backend** — parsing runs 100% client-side via [tree-sitter](https://tree-sitter.github.io/) WASM
+- **Multi-language** — Java, Kotlin, C#, TypeScript, Python, PHP, Ruby
+- **6 relation types** — extends, implements, field, parameter, returns, creates
+- **Interactive graph** — force-directed layout, zoom, pan, drag
+- **Focus mode** — click a node to highlight it and its direct connections
+- **Relation filters** — toggle each relation type independently
+- **Isolated panel** — classes with no connections listed separately
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Supported Languages
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Language | Class | Abstract | Interface | Enum | Record | Sealed | Struct | Object | Trait | Dataclass |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Java | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | | | |
+| Kotlin | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | ✓ | | |
+| C# | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | | |
+| TypeScript | ✓ | ✓ | ✓ | ✓ | | | | | | |
+| Python | ✓ | | | | | | | | | ✓ |
+| PHP | ✓ | ✓ | ✓ | ✓ | | | | | ✓ | |
+| Ruby | ✓ | | | | | | | | ✓ | |
+
+## Detected Relations
+
+| Type | Meaning | Visual |
+|---|---|---|
+| `extends` | Inheritance | Dotted |
+| `implements` | Interface / contract | Dashed |
+| `field` | Attribute of that type | Solid thick |
+| `parameter` | Method parameter of that type | Dense dotted |
+| `returns` | Method return type | Dash-dot |
+| `creates` | Instantiation / static access | Double dash |
+
+## Stack
+
+- [React 19](https://react.dev/) + TypeScript (strict)
+- [web-tree-sitter](https://github.com/tree-sitter/tree-sitter) — client-side WASM parsing
+- [@xyflow/react](https://reactflow.dev/) — interactive graph canvas
+- [roughjs](https://roughjs.com/) — hand-drawn edge style
+- [Vitest](https://vitest.dev/) — unit tests
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173), click **Selecionar pasta** and pick any project directory.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev        # dev server with hot reload
+npm run build      # production build
+npm run preview    # serve the production build locally
+npm test           # run tests in watch mode
+npm run test:run   # run tests once
+npm run coverage   # test coverage report
 ```
