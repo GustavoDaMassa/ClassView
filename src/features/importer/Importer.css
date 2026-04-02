@@ -1,0 +1,91 @@
+.importer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+}
+
+.importer__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  width: 100%;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.importer__icon {
+  font-size: 48px;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.importer__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--color-text);
+}
+
+.importer__subtitle {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.importer__button {
+  margin-top: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.importer__button:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.importer__progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.importer__progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.importer__progress-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 3px;
+  transition: width 0.15s ease;
+}
+
+.importer__progress-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.importer__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
