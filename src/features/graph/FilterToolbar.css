@@ -52,20 +52,12 @@
   background-color: var(--color-bg);
 }
 
-.filter-btn--extends.filter-btn--active {
-  border-color: var(--edge-extends);
-  color: var(--edge-extends);
-}
-
-.filter-btn--implements.filter-btn--active {
-  border-color: var(--edge-implements);
-  color: var(--edge-implements);
-}
-
-.filter-btn--depends.filter-btn--active {
-  border-color: var(--edge-depends);
-  color: var(--edge-depends);
-}
+.filter-btn--extends.filter-btn--active    { border-color: var(--edge-extends);    color: var(--edge-extends); }
+.filter-btn--implements.filter-btn--active { border-color: var(--edge-implements); color: var(--edge-implements); }
+.filter-btn--field.filter-btn--active      { border-color: var(--edge-field);      color: var(--edge-field); }
+.filter-btn--parameter.filter-btn--active  { border-color: var(--edge-parameter);  color: var(--edge-parameter); }
+.filter-btn--returns.filter-btn--active    { border-color: var(--edge-returns);    color: var(--edge-returns); }
+.filter-btn--creates.filter-btn--active    { border-color: var(--edge-creates);    color: var(--edge-creates); }
 
 .filter-btn__line {
   display: inline-block;
@@ -74,19 +66,13 @@
   background-color: currentColor;
 }
 
-.filter-btn__line--dotted {
-  background: none;
-  border-top: 2px dotted currentColor;
-}
-
-.filter-btn__line--dashed {
-  background: none;
-  border-top: 2px dashed currentColor;
-}
-
-.filter-btn__line--solid {
-  background-color: currentColor;
-}
+.filter-btn__line--dotted      { background: none; border-top: 2px dotted currentColor; }
+.filter-btn__line--dashed      { background: none; border-top: 2px dashed currentColor; }
+.filter-btn__line--solid         { background-color: currentColor; height: 1.5px; }
+.filter-btn__line--dotted-dense  { background: none; border-top: 2px dotted currentColor; letter-spacing: -1px; }
+.filter-btn__line--solid-thick { background-color: currentColor; height: 3px; }
+.filter-btn__line--dash-dot    { background: none; border-top: 2px dashed currentColor; opacity: 0.7; }
+.filter-btn__line--double-dash { background: none; border-top: 4px double currentColor; }
 
 .toolbar-btn {
   padding: 4px 10px;

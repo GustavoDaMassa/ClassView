@@ -1,6 +1,6 @@
 .poo-node {
   min-width: 160px;
-  max-width: 260px;
+  max-width: 320px;
   padding: 10px 14px;
   border-radius: 6px;
   border: 2px solid var(--node-class-border);
@@ -34,9 +34,7 @@
   font-weight: 600;
   color: var(--node-text);
   text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .poo-node__details {
