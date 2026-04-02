@@ -5,7 +5,6 @@ import { Importer } from './features/importer/Importer'
 import { GraphView } from './features/graph/GraphView'
 import { FilterToolbar } from './features/graph/FilterToolbar'
 import type { RelationFilter } from './features/graph/FilterToolbar'
-import { useTheme } from './shared/hooks/useTheme'
 import { buildGraph } from './core/graph/GraphBuilder'
 import type { ElementNode } from './core/graph/GraphBuilder'
 import { ParserEngine } from './core/parser/ParserEngine'
@@ -18,7 +17,10 @@ type AppState = 'import' | 'graph'
 const DEFAULT_FILTERS: RelationFilter = {
   extends: true,
   implements: true,
-  depends: true,
+  field: true,
+  parameter: true,
+  returns: true,
+  creates: true,
 }
 
 interface GraphData {
@@ -30,7 +32,6 @@ interface GraphData {
 const engine = new ParserEngine(createRegistry())
 
 export default function App() {
-  const { theme, toggle } = useTheme()
   const [state, setState] = useState<AppState>('import')
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -82,8 +83,6 @@ export default function App() {
           <FilterToolbar
             filters={filters}
             onChange={setFilters}
-            theme={theme}
-            onToggleTheme={toggle}
             onReset={handleReset}
           />
           {graphData && (
