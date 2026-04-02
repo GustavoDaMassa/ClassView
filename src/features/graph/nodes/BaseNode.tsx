@@ -28,7 +28,14 @@ export const BaseNode = memo(function BaseNode({
       className={`poo-node ${cssClass} ${selected ? 'poo-node--selected' : ''} ${expanded ? 'poo-node--expanded' : ''}`}
       onClick={handleClick}
     >
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Top}    id="top"    />
+      <Handle type="target" position={Position.Bottom} id="bottom" />
+      <Handle type="target" position={Position.Left}   id="left"   />
+      <Handle type="target" position={Position.Right}  id="right"  />
+      <Handle type="source" position={Position.Top}    id="top"    />
+      <Handle type="source" position={Position.Bottom} id="bottom" />
+      <Handle type="source" position={Position.Left}   id="left"   />
+      <Handle type="source" position={Position.Right}  id="right"  />
 
       {stereotype && (
         <div className="poo-node__stereotype">{stereotype}</div>
@@ -70,7 +77,6 @@ export const BaseNode = memo(function BaseNode({
         </div>
       )}
 
-      <Handle type="source" position={Position.Bottom} />
     </div>
   )
 })
