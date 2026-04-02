@@ -93,10 +93,16 @@ function extractMethods(bodyNode: SyntaxNode | null): Method[] {
   return methods
 }
 
-function extractRelations(
-  node: SyntaxNode,
-  className: string,
-): Relation[] {
+function collectTypeIdentifiers(node: SyntaxNode, out: Set<string>) {
+  if (node.type === 'type_identifier') {
+    out.add(node.text)
+  }
+  for (const child of children(node)) {
+    collectTypeIdentifiers(child, out)
+  }
+}
+
+function extractRelations(node: SyntaxNode, className: string): Relation[] {
   const relations: Relation[] = []
 
   // extends
@@ -123,18 +129,56 @@ function extractRelations(
     }
   }
 
-  // field-type dependencies
   const body = node.childForFieldName('body')
-  if (body) {
-    for (const child of children(body)) {
-      if (child.type === 'field_declaration') {
-        const typeNode = child.childForFieldName('type')
-        if (typeNode && typeNode.type === 'type_identifier') {
-          relations.push({ source: className, target: typeNode.text, type: 'depends' })
+  if (!body) return relations
+
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'field_declaration') {
+      const typeNode = member.childForFieldName('type')
+      if (typeNode) collectTypeIdentifiers(typeNode, fieldTypes)
+    }
+
+    if (member.type === 'method_declaration' || member.type === 'constructor_declaration') {
+      const retType = member.childForFieldName('type')
+      if (retType) collectTypeIdentifiers(retType, returnTypes)
+
+      const params = member.childForFieldName('parameters')
+      if (params) {
+        for (const p of children(params)) {
+          const pType = p.childForFieldName('type')
+          if (pType) collectTypeIdentifiers(pType, paramTypes)
         }
       }
+
+      const collectNew = (n: SyntaxNode) => {
+        // new B()
+        if (n.type === 'object_creation_expression') {
+          const typeNode = n.childForFieldName('type')
+          if (typeNode) collectTypeIdentifiers(typeNode, createTypes)
+        }
+        // B.staticMethod() or B.STATIC_FIELD
+        if (n.type === 'method_invocation' || n.type === 'field_access') {
+          const obj = n.childForFieldName('object')
+          if (obj && (obj.type === 'type_identifier' || obj.type === 'identifier') && /^[A-Z]/.test(obj.text)) {
+            createTypes.add(obj.text)
+          }
+        }
+        for (const c of children(n)) collectNew(c)
+      }
+      const methodBody = member.childForFieldName('body')
+      if (methodBody) collectNew(methodBody)
     }
   }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
 
   return relations
 }

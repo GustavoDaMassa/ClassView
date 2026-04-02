@@ -73,7 +73,7 @@ function extractMethods(bodyNode: SyntaxNode | null): Method[] {
 function extractRelations(node: SyntaxNode, className: string): Relation[] {
   const relations: Relation[] = []
 
-  // inheritance via argument_list: class Dog(Animal)
+  // inheritance: class Dog(Animal)
   const argList = children(node).find(c => c.type === 'argument_list')
   if (argList) {
     for (const child of children(argList)) {
@@ -83,28 +83,62 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
     }
   }
 
-  // dependencies from __init__ typed parameters
   const body = children(node).find(c => c.type === 'block') ?? null
-  if (body) {
-    for (const child of children(body)) {
-      if (child.type === 'function_definition') {
-        const nameNode = children(child).find(c => c.type === 'identifier')
-        if (nameNode?.text !== '__init__') continue
+  if (!body) return relations
 
-        const params = children(child).find(c => c.type === 'parameters')
-        if (!params) continue
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
 
+  for (const member of children(body)) {
+    if (member.type === 'expression_statement') {
+      const annAssign = children(member).find(c => c.type === 'assignment')
+      if (annAssign) {
+        const typeNode = children(annAssign).find(c => c.type === 'type')
+        if (typeNode) fieldTypes.add(typeNode.text)
+      }
+    }
+
+    if (member.type === 'annotated_assignment') {
+      const typeNode = children(member).find(c => c.type === 'type' || c.type === 'identifier')
+      if (typeNode) fieldTypes.add(typeNode.text)
+    }
+
+    if (member.type === 'function_definition') {
+      const nameNode = children(member).find(c => c.type === 'identifier')
+      if (!nameNode) continue
+
+      const params = children(member).find(c => c.type === 'parameters')
+      if (params) {
         for (const param of children(params)) {
           if (param.type === 'typed_parameter') {
             const typeNode = children(param).find(c => c.type === 'type')
-            if (typeNode && typeNode.text !== className) {
-              relations.push({ source: className, target: typeNode.text, type: 'depends' })
-            }
+            if (typeNode) paramTypes.add(typeNode.text)
           }
         }
       }
+
+      const retType = children(member).find(c => c.type === 'type')
+      if (retType) returnTypes.add(retType.text)
+
+      const collectCalls = (n: SyntaxNode) => {
+        if (n.type === 'call') {
+          const fn = children(n).find(c => c.type === 'identifier' || c.type === 'attribute')
+          const name = fn?.text?.split('.').pop() ?? ''
+          if (name && /^[A-Z]/.test(name)) createTypes.add(name)
+        }
+        for (const c of children(n)) collectCalls(c)
+      }
+      const fnBody = children(member).find(c => c.type === 'block')
+      if (fnBody) collectCalls(fnBody)
     }
   }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
 
   return relations
 }

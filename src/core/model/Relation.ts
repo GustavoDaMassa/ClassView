@@ -1,4 +1,4 @@
-export type RelationType = 'extends' | 'implements' | 'depends'
+export type RelationType = 'extends' | 'implements' | 'field' | 'parameter' | 'returns' | 'creates'
 
 export interface Relation {
   source: string

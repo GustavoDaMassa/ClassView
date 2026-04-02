@@ -83,40 +83,75 @@ function extractMethods(bodyNode: SyntaxNode | null): Method[] {
   return methods
 }
 
+function collectUserTypes(node: SyntaxNode, out: Set<string>) {
+  if (node.type === 'user_type') {
+    const name = children(node).find(c => c.type === 'type_identifier')?.text ?? node.text.split('<')[0].trim()
+    if (name) out.add(name)
+    return // don't recurse into generic args to avoid noise
+  }
+  for (const child of children(node)) collectUserTypes(child, out)
+}
+
 function extractRelations(node: SyntaxNode, className: string): Relation[] {
   const relations: Relation[] = []
 
+  // extends / implements via delegation specifiers
   for (const child of children(node)) {
     if (child.type === 'delegation_specifier') {
       const constructorInvocation = children(child).find(c => c.type === 'constructor_invocation')
-
       if (constructorInvocation) {
-        // extends: class Dog : Animal()
         const target = children(constructorInvocation).find(c => c.type === 'user_type')?.text
           ?? constructorInvocation.text.replace(/\(.*\)/, '').trim()
         relations.push({ source: className, target, type: 'extends' })
       } else {
-        // implements: class Cat : Printable
-        const target = children(child).find(c => c.type === 'user_type')?.text
-          ?? child.text.trim()
+        const target = children(child).find(c => c.type === 'user_type')?.text ?? child.text.trim()
         relations.push({ source: className, target, type: 'implements' })
       }
     }
   }
 
-  // property-type dependencies
   const body = children(node).find(c => c.type === 'class_body') ?? null
-  if (body) {
-    for (const child of children(body)) {
-      if (child.type === 'property_declaration') {
-        const varDecl = children(child).find(c => c.type === 'variable_declaration')
-        const typeNode = (varDecl ? children(varDecl) : []).find(c => c.type === 'user_type')
-        if (typeNode) {
-          relations.push({ source: className, target: typeNode.text, type: 'depends' })
+  if (!body) return relations
+
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'property_declaration') {
+      const varDecl = children(member).find(c => c.type === 'variable_declaration')
+      if (varDecl) collectUserTypes(varDecl, fieldTypes)
+    }
+
+    if (member.type === 'function_declaration' || member.type === 'secondary_constructor') {
+      const retType = children(member).find(c => c.type === 'user_type' || c.type === 'nullable_type')
+      if (retType) collectUserTypes(retType, returnTypes)
+
+      const params = children(member).find(c => c.type === 'function_value_parameters')
+      if (params) {
+        for (const p of children(params)) {
+          const pType = children(p).find(c => c.type === 'user_type' || c.type === 'nullable_type')
+          if (pType) collectUserTypes(pType, paramTypes)
         }
       }
+
+      const collectCalls = (n: SyntaxNode) => {
+        if (n.type === 'call_expression') {
+          const callNode = children(n).find(c => c.type === 'simple_identifier')
+          if (callNode && /^[A-Z]/.test(callNode.text)) createTypes.add(callNode.text)
+        }
+        for (const c of children(n)) collectCalls(c)
+      }
+      const fnBody = children(member).find(c => c.type === 'block' || c.type === 'function_body')
+      if (fnBody) collectCalls(fnBody)
     }
   }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
 
   return relations
 }

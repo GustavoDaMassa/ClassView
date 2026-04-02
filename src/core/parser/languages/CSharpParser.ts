@@ -107,6 +107,7 @@ function isInterface(name: string): boolean {
   return name.length > 1 && name[0] === 'I' && name[1] === name[1].toUpperCase() && name[1] !== name[1].toLowerCase()
 }
 
+
 function extractRelations(node: SyntaxNode, className: string): Relation[] {
   const relations: Relation[] = []
 
@@ -123,19 +124,49 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
     }
   }
 
-  // field-type dependencies
   const body = children(node).find(c => c.type === 'declaration_list') ?? null
-  if (body) {
-    for (const child of children(body)) {
-      if (child.type === 'field_declaration') {
-        const varDecl = children(child).find(c => c.type === 'variable_declaration')
-        const typeNode = (varDecl ? children(varDecl) : []).find(c => c.type === 'identifier')
-        if (typeNode && typeNode.text !== className) {
-          relations.push({ source: className, target: typeNode.text, type: 'depends' })
+  if (!body) return relations
+
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'field_declaration') {
+      const varDecl = children(member).find(c => c.type === 'variable_declaration')
+      const typeNode = (varDecl ? children(varDecl) : []).find(c => c.type === 'identifier' || c.type === 'generic_name')
+      if (typeNode) fieldTypes.add(typeNode.text.split('<')[0])
+    }
+
+    if (member.type === 'method_declaration' || member.type === 'constructor_declaration') {
+      const retType = children(member).find(c => c.type === 'identifier' || c.type === 'generic_name')
+      if (retType) returnTypes.add(retType.text.split('<')[0])
+
+      const params = children(member).find(c => c.type === 'parameter_list')
+      if (params) {
+        for (const p of children(params)) {
+          const pType = children(p).find(c => c.type === 'identifier' || c.type === 'generic_name')
+          if (pType) paramTypes.add(pType.text.split('<')[0])
         }
       }
+
+      const collectNew = (n: SyntaxNode) => {
+        if (n.type === 'object_creation_expression') {
+          const typeNode = children(n).find(c => c.type === 'identifier' || c.type === 'generic_name')
+          if (typeNode) createTypes.add(typeNode.text.split('<')[0])
+        }
+        for (const c of children(n)) collectNew(c)
+      }
+      const mBody = children(member).find(c => c.type === 'block')
+      if (mBody) collectNew(mBody)
     }
   }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
 
   return relations
 }

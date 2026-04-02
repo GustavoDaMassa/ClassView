@@ -36,6 +36,37 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
     if (target) relations.push({ source: className, target, type: 'extends' })
   }
 
+  const body = children(node).find(c => c.type === 'body_statement') ?? null
+  if (!body) return relations
+
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'call') {
+      const methodId = children(member).find(c => c.type === 'identifier')
+      if (methodId?.text === 'include' || methodId?.text === 'prepend') {
+        const arg = children(member).find(c => c.type === 'argument_list')
+        const constant = (arg ? children(arg) : []).find(c => c.type === 'constant')
+        if (constant) relations.push({ source: className, target: constant.text, type: 'implements' })
+      }
+    }
+
+    if (member.type === 'method') {
+      const collectNew = (n: SyntaxNode) => {
+        if (n.type === 'call' && children(n).some(c => c.type === 'identifier' && c.text === 'new')) {
+          const recv = children(n).find(c => c.type === 'constant')
+          if (recv) createTypes.add(recv.text)
+        }
+        for (const c of children(n)) collectNew(c)
+      }
+      collectNew(member)
+    }
+  }
+
+  for (const target of createTypes) {
+    if (target !== className) relations.push({ source: className, target, type: 'creates' })
+  }
+
   return relations
 }
 

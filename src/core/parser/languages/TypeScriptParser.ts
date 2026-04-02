@@ -76,6 +76,11 @@ function extractMethods(bodyNode: SyntaxNode | null): Method[] {
   return methods
 }
 
+function collectTypeRefs(node: SyntaxNode, out: Set<string>) {
+  if (node.type === 'type_identifier') { out.add(node.text); return }
+  for (const child of children(node)) collectTypeRefs(child, out)
+}
+
 function extractRelations(node: SyntaxNode, className: string): Relation[] {
   const relations: Relation[] = []
 
@@ -88,7 +93,6 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
         )?.text
         if (target) relations.push({ source: className, target, type: 'extends' })
       }
-
       if (clause.type === 'implements_clause') {
         for (const child of children(clause)) {
           if (child.type === 'type_identifier' || child.type === 'identifier') {
@@ -99,19 +103,48 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
     }
   }
 
-  // field-type dependencies
-  const body = children(node).find(c => c.type === 'class_body') ?? null
-  if (body) {
-    for (const child of children(body)) {
-      if (child.type === 'public_field_definition') {
-        const typeAnnotation = children(child).find(c => c.type === 'type_annotation')
-        const typeNode = (typeAnnotation ? children(typeAnnotation) : []).find(c => c.type === 'type_identifier')
-        if (typeNode) {
-          relations.push({ source: className, target: typeNode.text, type: 'depends' })
+  const body = children(node).find(c => c.type === 'class_body' || c.type === 'interface_body') ?? null
+  if (!body) return relations
+
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'public_field_definition') {
+      const typeAnnotation = children(member).find(c => c.type === 'type_annotation')
+      if (typeAnnotation) collectTypeRefs(typeAnnotation, fieldTypes)
+    }
+
+    if (member.type === 'method_definition') {
+      const retAnnotation = children(member).find(c => c.type === 'type_annotation')
+      if (retAnnotation) collectTypeRefs(retAnnotation, returnTypes)
+
+      const params = children(member).find(c => c.type === 'formal_parameters')
+      if (params) {
+        for (const p of children(params)) {
+          const pType = children(p).find(c => c.type === 'type_annotation')
+          if (pType) collectTypeRefs(pType, paramTypes)
         }
       }
+
+      const collectNew = (n: SyntaxNode) => {
+        if (n.type === 'new_expression') {
+          const typeNode = children(n).find(c => c.type === 'identifier' || c.type === 'type_identifier')
+          if (typeNode) createTypes.add(typeNode.text)
+        }
+        for (const c of children(n)) collectNew(c)
+      }
+      const mBody = children(member).find(c => c.type === 'statement_block')
+      if (mBody) collectNew(mBody)
     }
   }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
 
   return relations
 }

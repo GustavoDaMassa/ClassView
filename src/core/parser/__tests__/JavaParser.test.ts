@@ -137,7 +137,7 @@ describe('JavaParser — relations', () => {
         private OrderRepository repository;
       }
     `)
-    expect(relations.some(r => r.type === 'depends' && r.target === 'OrderRepository')).toBe(true)
+    expect(relations.some(r => r.type === 'field' && r.target === 'OrderRepository')).toBe(true)
   })
 })
 

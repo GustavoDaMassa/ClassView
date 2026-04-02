@@ -116,6 +116,6 @@ describe('CSharpParser — relations', () => {
         private OrderRepository _repository;
       }
     `)
-    expect(relations.some(r => r.type === 'depends' && r.target === 'OrderRepository')).toBe(true)
+    expect(relations.some(r => r.type === 'field' && r.target === 'OrderRepository')).toBe(true)
   })
 })

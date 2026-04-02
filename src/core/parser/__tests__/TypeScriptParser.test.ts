@@ -110,6 +110,6 @@ describe('TypeScriptParser — relations', () => {
         private repo: OrderRepository
       }
     `)
-    expect(relations.some(r => r.type === 'depends' && r.target === 'OrderRepository')).toBe(true)
+    expect(relations.some(r => r.type === 'field' && r.target === 'OrderRepository')).toBe(true)
   })
 })

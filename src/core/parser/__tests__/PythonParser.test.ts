@@ -94,6 +94,6 @@ class OrderService:
     def __init__(self, repo: OrderRepository):
         self.repo = repo
     `)
-    expect(relations.some(r => r.type === 'depends' && r.target === 'OrderRepository')).toBe(true)
+    expect(relations.some(r => r.type === 'parameter' && r.target === 'OrderRepository')).toBe(true)
   })
 })

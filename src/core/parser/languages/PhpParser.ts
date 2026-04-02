@@ -91,6 +91,56 @@ function extractRelations(node: SyntaxNode, className: string): Relation[] {
     }
   }
 
+  // use_trait inside body
+  const body = children(node).find(c => c.type === 'declaration_list') ?? null
+  if (!body) return relations
+
+  const fieldTypes = new Set<string>()
+  const paramTypes = new Set<string>()
+  const returnTypes = new Set<string>()
+  const createTypes = new Set<string>()
+
+  for (const member of children(body)) {
+    if (member.type === 'use_declaration') {
+      for (const child of children(member)) {
+        if (child.type === 'name') relations.push({ source: className, target: child.text, type: 'implements' })
+      }
+    }
+
+    if (member.type === 'property_declaration') {
+      const typeNode = children(member).find(c => c.type === 'named_type')
+      if (typeNode) fieldTypes.add(typeNode.text)
+    }
+
+    if (member.type === 'method_declaration') {
+      const retType = children(member).find(c => c.type === 'named_type')
+      if (retType) returnTypes.add(retType.text)
+
+      const params = children(member).find(c => c.type === 'formal_parameters')
+      if (params) {
+        for (const p of children(params)) {
+          const pType = children(p).find(c => c.type === 'named_type')
+          if (pType) paramTypes.add(pType.text)
+        }
+      }
+
+      const collectNew = (n: SyntaxNode) => {
+        if (n.type === 'object_creation_expression') {
+          const typeNode = children(n).find(c => c.type === 'name' || c.type === 'qualified_name')
+          if (typeNode) createTypes.add(typeNode.text.split('\\').pop()!)
+        }
+        for (const c of children(n)) collectNew(c)
+      }
+      const mBody = children(member).find(c => c.type === 'compound_statement')
+      if (mBody) collectNew(mBody)
+    }
+  }
+
+  for (const target of fieldTypes)  if (target !== className) relations.push({ source: className, target, type: 'field' })
+  for (const target of paramTypes)  if (target !== className && !fieldTypes.has(target)) relations.push({ source: className, target, type: 'parameter' })
+  for (const target of returnTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target)) relations.push({ source: className, target, type: 'returns' })
+  for (const target of createTypes) if (target !== className && !fieldTypes.has(target) && !paramTypes.has(target) && !returnTypes.has(target)) relations.push({ source: className, target, type: 'creates' })
+
   return relations
 }
 

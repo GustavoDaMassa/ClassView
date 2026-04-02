@@ -109,6 +109,6 @@ describe('KotlinParser — relations', () => {
         private val repository: OrderRepository
       }
     `)
-    expect(relations.some(r => r.type === 'depends' && r.target === 'OrderRepository')).toBe(true)
+    expect(relations.some(r => r.type === 'field' && r.target === 'OrderRepository')).toBe(true)
   })
 })
