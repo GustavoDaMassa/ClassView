@@ -1,32 +1,30 @@
 <div align="center">
 
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100">
-  <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" fill="none" stroke="#388bfd" stroke-width="6" stroke-linejoin="round"/>
-</svg>
+<img src="src/assets/classviewlogo.png" alt="ClassView" width="200"/>
 
 # ClassView
 
-**Interactive OOP visualizer — select a project folder, explore your class graph.**
+**Visualizador interativo de OOP — selecione uma pasta de projeto e explore o grafo de classes.**
 
-Analyzes source files entirely in the browser via WebAssembly and renders classes, interfaces, abstract classes, enums, records and all their relationships as an interactive graph.
+Analisa os arquivos fonte inteiramente no navegador via WebAssembly e renderiza classes, interfaces, classes abstratas, enums, records e todos os seus relacionamentos como um grafo interativo.
 
 </div>
 
 ---
 
-## Features
+## Funcionalidades
 
-- **No backend** — parsing runs 100% client-side via [tree-sitter](https://tree-sitter.github.io/) WASM
-- **Multi-language** — Java, Kotlin, C#, TypeScript, Python, PHP, Ruby
-- **6 relation types** — extends, implements, field, parameter, returns, creates
-- **Interactive graph** — force-directed layout, zoom, pan, drag
-- **Focus mode** — click a node to highlight it and its direct connections
-- **Relation filters** — toggle each relation type independently
-- **Isolated panel** — classes with no connections listed separately
+- **Sem backend** — o parsing roda 100% no cliente via [tree-sitter](https://tree-sitter.github.io/) WASM
+- **Multi-linguagem** — Java, Kotlin, C#, TypeScript, Python, PHP, Ruby
+- **6 tipos de relação** — extends, implements, field, parameter, returns, creates
+- **Grafo interativo** — layout force-directed, zoom, pan, arrastar
+- **Modo foco** — clique em um nó para destacá-lo e suas conexões diretas
+- **Filtros de relação** — ative/desative cada tipo de relação independentemente
+- **Painel de isolados** — classes sem conexões listadas separadamente
 
-## Supported Languages
+## Linguagens Suportadas
 
-| Language | Class | Abstract | Interface | Enum | Record | Sealed | Struct | Object | Trait | Dataclass |
+| Linguagem | Class | Abstract | Interface | Enum | Record | Sealed | Struct | Object | Trait | Dataclass |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Java | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | | | |
 | Kotlin | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | ✓ | | |
@@ -36,41 +34,41 @@ Analyzes source files entirely in the browser via WebAssembly and renders classe
 | PHP | ✓ | ✓ | ✓ | ✓ | | | | | ✓ | |
 | Ruby | ✓ | | | | | | | | ✓ | |
 
-## Detected Relations
+## Relações Detectadas
 
-| Type | Meaning | Visual |
+| Tipo | Significado | Visual |
 |---|---|---|
-| `extends` | Inheritance | Dotted |
-| `implements` | Interface / contract | Dashed |
-| `field` | Attribute of that type | Solid thick |
-| `parameter` | Method parameter of that type | Dense dotted |
-| `returns` | Method return type | Dash-dot |
-| `creates` | Instantiation / static access | Double dash |
+| `extends` | Herança | Pontilhado |
+| `implements` | Interface / contrato | Tracejado |
+| `field` | Atributo desse tipo | Sólido espesso |
+| `parameter` | Parâmetro de método desse tipo | Pontilhado denso |
+| `returns` | Tipo de retorno de método | Traço-ponto |
+| `creates` | Instanciação / acesso estático | Traço duplo |
 
-## Stack
+## Tecnologias
 
 - [React 19](https://react.dev/) + TypeScript (strict)
-- [web-tree-sitter](https://github.com/tree-sitter/tree-sitter) — client-side WASM parsing
-- [@xyflow/react](https://reactflow.dev/) — interactive graph canvas
-- [roughjs](https://roughjs.com/) — hand-drawn edge style
-- [Vitest](https://vitest.dev/) — unit tests
+- [web-tree-sitter](https://github.com/tree-sitter/tree-sitter) — parsing WASM no cliente
+- [@xyflow/react](https://reactflow.dev/) — canvas de grafo interativo
+- [roughjs](https://roughjs.com/) — estilo de arestas desenhado à mão
+- [Vitest](https://vitest.dev/) — testes unitários
 
-## Getting Started
+## Como rodar
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173), click **Selecionar pasta** and pick any project directory.
+Abra [http://localhost:5173](http://localhost:5173), clique em **Selecionar pasta** e escolha qualquer diretório de projeto.
 
 ## Scripts
 
 ```bash
-npm run dev        # dev server with hot reload
-npm run build      # production build
-npm run preview    # serve the production build locally
-npm test           # run tests in watch mode
-npm run test:run   # run tests once
-npm run coverage   # test coverage report
+npm run dev        # servidor de desenvolvimento com hot reload
+npm run build      # build de produção
+npm run preview    # servir o build de produção localmente
+npm test           # rodar testes em modo watch
+npm run test:run   # rodar testes uma vez
+npm run coverage   # relatório de cobertura de testes
 ```
